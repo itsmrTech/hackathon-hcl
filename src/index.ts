@@ -38,7 +38,7 @@ app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/order', orderRoutes);
 app.use('/api/transaction', transactionRoutes);
 app.use('/api/securities', securityRoutes);
-
+app.use('/api/portfolio', portfolioRoutes);
 // Error handling middleware
 app.use(notFound);
 app.use(errorHandler);
