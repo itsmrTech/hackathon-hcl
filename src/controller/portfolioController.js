@@ -2,7 +2,6 @@
 const Portfolio = require('../models/Portfolio');
 const { validationResult } = require('express-validator');
 
-// Create Portfolio Entry
 exports.createPortfolioEntry = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
