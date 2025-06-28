@@ -6,6 +6,6 @@ import { authenticate } from '../../../shared/middleware/auth';
 const router = Router();
 
 // Transaction history route
-router.get('/history', authenticate, validateTransactionHistory, TransactionController.getTransactionHistory);
+router.get('/history', validateTransactionHistory, TransactionController.getTransactionHistory);
 
 export default router; 

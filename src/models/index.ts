@@ -1,4 +1,3 @@
-// Core authentication and user management models
 export { User, type IUser } from './User'; // Main user model with authentication
 export { Order, type IOrder } from './Order'; // Main order model
 export { Security, type ISecurity } from './Security'; // Main security model

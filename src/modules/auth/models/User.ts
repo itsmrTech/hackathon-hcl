@@ -37,17 +37,16 @@ const userSchema = new Schema<IUser>({
   },
   accountBalance: {
     type: Number,
-    default: 10000, // Starting balance
+    default: 10000,
     min: 0,
   },
 }, {
   timestamps: true,
 });
 
-// Hash password before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  
+
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
@@ -57,9 +56,8 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-// Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
-  return bcrypt.compare(candidatePassword, this.password);
+userSchema.methods["comparePassword"] = async function (candidatePassword: string): Promise<boolean> {
+  return bcrypt.compare(candidatePassword, this["password"]);
 };
 
 export const User = mongoose.model<IUser>('User', userSchema); 
