@@ -1,13 +1,14 @@
 import { Response, NextFunction } from "express";
-import { AuthRequest } from "../../../shared/middleware/auth";
+import { AuthRequest } from "../../../middleware/auth";
 import { AuditAction } from "../../../models/AuditAction";
 import { OrderDetail } from "../../../models/OrderDetail";
-import axios from "axios";
 import { Security } from "../../securities";
+import { QueueService } from "../../queue/services/queueService";
+import { ILoggedInRequest } from "../../../shared/interface";
 
 export class OrderController {
   static async placeOrder(
-    req: AuthRequest,
+    req: ILoggedInRequest,
     res: Response,
     next: NextFunction
   ): Promise<any> {
@@ -27,6 +28,7 @@ export class OrderController {
        * 9. Send back order number, status, and total cost
        */
       const { orderRefNo, fundName, transactionType, quantity } = req.body;
+      
       const securityDetail = await Security.findOne({
         securityName: fundName,
       }).lean();
@@ -37,50 +39,68 @@ export class OrderController {
           message: "Security detail not found",
         });
       }
-      const auditAction = new AuditAction({
-        userLoginDetail: req.user.id,
-        userAction: "Place Order",
-        startDateTime: new Date(),
-        endDateTime: null,
-      });
-      await auditAction.save();
 
-      const orderDetail = new OrderDetail({
-        securityDetail: securityDetail._id,
-        transactionType: transactionType,
-        quantity: quantity,
-        orderStatus: "PENDING",
-        createdBy: req.user.id,
-        createdOn: new Date(),
-      });
-      await orderDetail.save();
-      const response = await axios.post("http://localhost:3001/order", {
-        fundName,
-        transactionType,
-        quantity,
-      });
+      // Calculate order value
+      const orderValue = quantity * securityDetail.value;
 
-      if (response.status === 200) {
-        orderDetail.orderStatus = "COMPLETED";
-        orderDetail.orderRefNo = response.data.orderRefNo;
-        orderDetail.orderValue = response.data.unitPrice*quantity;
-      
-        await orderDetail.save();
-      } else {
-        orderDetail.orderStatus = "CANCELLED";
-        await orderDetail.save();
+      // Create audit action and order detail in parallel
+      const [auditAction, orderDetail] = await Promise.all([
+        new AuditAction({
+          userLoginDetail: req.user.id,
+          userAction: "Place Order",
+          startDateTime: new Date(),
+          endDateTime: null,
+        }).save(),
+        new OrderDetail({
+          securityDetail: securityDetail._id,
+          transactionType: transactionType,
+          orderValue: orderValue,
+          orderStatus: "PENDING",
+          createdBy: req.user.id,
+          createdOn: new Date(),
+          quantity: quantity,
+        }).save()
+      ]);
+
+      // Add order to queue for processing
+      try {
+        if(Date.now()-auditAction.startDateTime.getTime()>1000){
+          auditAction.endDateTime = new Date();
+          await auditAction.save();
+          return res.status(500).json({
+            success: false,
+            message: "Failed to process order. Please try again later.",
+          });
+        }
+        await QueueService.addOrderToQueue(orderDetail);
+        
+        // Update audit action end time
+        auditAction.endDateTime = new Date();
+        await auditAction.save();
+
+        return res.status(200).json({
+          success: true,
+          data: {
+            orderRefNo: orderDetail.orderRefNo || `ORD${orderDetail._id}`,
+            status: "Submitted",
+            orderValue: orderValue,
+            message: "Order has been queued for processing"
+          },
+        });
+      } catch (queueError) {
+        console.error('Failed to add order to queue:', queueError);
+        
+        // Update order status and audit action end time in parallel
+        await Promise.all([
+          OrderDetail.findByIdAndUpdate(orderDetail._id, { orderStatus: "CANCELLED" }),
+          AuditAction.findByIdAndUpdate(auditAction._id, { endDateTime: new Date() })
+        ]);
+
+        return res.status(500).json({
+          success: false,
+          message: "Failed to process order. Please try again later.",
+        });
       }
-      
-
-
-      return res.status(200).json({
-        success: true,
-        data: {
-          orderRefNo: "ORD123456",
-          status: "Submitted",
-          orderValue: 1000,
-        },
-      });
     } catch (error) {
       next(error);
     }
@@ -90,15 +110,55 @@ export class OrderController {
     req: AuthRequest,
     res: Response,
     next: NextFunction
-  ): Promise<void> {
+  ): Promise<any> {
     try {
-      // TODO: Implement order status logic
-      res.status(200).json({
+      const { orderRefNo } = req.params;
+      
+      if (!req.user) {
+        return res.status(401).json({
+          success: false,
+          message: "User not authenticated",
+        });
+      }
+      
+      const order = await OrderDetail.findOne({ 
+        orderRefNo: orderRefNo,
+        createdBy: req.user.id 
+      });
+
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: "Order not found",
+        });
+      }
+
+      return res.status(200).json({
         success: true,
         data: {
-          orderRefNo: req.params.orderRefNo,
-          status: "Completed",
+          orderRefNo: order.orderRefNo,
+          status: order.orderStatus,
+          orderValue: order.orderValue,
+          transactionType: order.transactionType,
+          createdOn: order.createdOn,
         },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getQueueStatus(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<any> {
+    try {
+      const status = await QueueService.getQueueStatus();
+      
+      return res.status(200).json({
+        success: true,
+        data: status,
       });
     } catch (error) {
       next(error);

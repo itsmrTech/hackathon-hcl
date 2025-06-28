@@ -13,12 +13,13 @@ import { portfolioRoutes } from './modules/portfolio';
 import { orderRoutes } from './modules/order';
 import { transactionRoutes } from './modules/transactions';
 import { securityRoutes } from './modules/securities';
+import { QueueService } from './modules/queue';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env['PORT'] || 3000;
 
 // Middleware
 app.use(helmet());
@@ -49,9 +50,12 @@ const startServer = async (): Promise<void> => {
     // Connect to MongoDB
     await connectDB();
     
+    // Initialize Queue Service
+    await QueueService.initialize();
+    
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📊 Environment: ${process.env.NODE_ENV}`);
+      console.log(`📊 Environment: ${process.env['NODE_ENV']}`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

@@ -8,6 +8,7 @@ export interface IOrderDetail extends Document {
   orderValue: number;
   createdOn: Date;
   createdBy: mongoose.Types.ObjectId;
+  quantity: number;
 }
 
 const orderDetailSchema = new Schema<IOrderDetail>({
@@ -38,6 +39,12 @@ const orderDetailSchema = new Schema<IOrderDetail>({
     type: Number,
     required: false,
     min:0
+  },
+  quantity: {
+    type: Number,
+    required: true,
+    min: 1,
+    default: 1,
   },
   createdOn: {
     type: Date,
