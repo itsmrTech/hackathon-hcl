@@ -27,7 +27,7 @@ export class OrderController {
        * 8. Keep response time under 1 second (use queue if needed)
        * 9. Send back order number, status, and total cost
        */
-      const { orderRefNo, fundName, transactionType, quantity } = req.body;
+      const { fundName, transactionType, quantity } = req.body;
       
       const securityDetail = await Security.findOne({
         securityName: fundName,
@@ -149,7 +149,7 @@ export class OrderController {
   }
 
   static async getQueueStatus(
-    req: AuthRequest,
+    _req: AuthRequest,
     res: Response,
     next: NextFunction
   ): Promise<any> {
