@@ -1,0 +1,34 @@
+
+services:
+  # Node.js Application
+  app:
+    build: .
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - portfolio-network
+
+  # Redis Cache
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - portfolio-network
+    command: redis-server --appendonly yes
+
+volumes:
+  redis_data:
+
+networks:
+  portfolio-network:
+    driver: bridge 

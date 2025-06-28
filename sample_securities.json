@@ -1,0 +1,102 @@
+[
+  {
+    "securityName": "AAPL",
+    "value": 175.50
+  },
+  {
+    "securityName": "MSFT",
+    "value": 338.25
+  },
+  {
+    "securityName": "GOOGL",
+    "value": 142.80
+  },
+  {
+    "securityName": "AMZN",
+    "value": 145.90
+  },
+  {
+    "securityName": "TSLA",
+    "value": 242.15
+  },
+  {
+    "securityName": "SPY",
+    "value": 456.75
+  },
+  {
+    "securityName": "QQQ",
+    "value": 378.40
+  },
+  {
+    "securityName": "US10Y",
+    "value": 98.25
+  },
+  {
+    "securityName": "JNJ",
+    "value": 165.30
+  },
+  {
+    "securityName": "PG",
+    "value": 152.45
+  },
+  {
+    "securityName": "BRK.A",
+    "value": 548000.00
+  },
+  {
+    "securityName": "V",
+    "value": 245.80
+  },
+  {
+    "securityName": "MA",
+    "value": 398.60
+  },
+  {
+    "securityName": "NFLX",
+    "value": 485.20
+  },
+  {
+    "securityName": "META",
+    "value": 312.75
+  },
+  {
+    "securityName": "NVDA",
+    "value": 485.90
+  },
+  {
+    "securityName": "INTC",
+    "value": 42.15
+  },
+  {
+    "securityName": "KO",
+    "value": 58.90
+  },
+  {
+    "securityName": "WMT",
+    "value": 165.40
+  },
+  {
+    "securityName": "HD",
+    "value": 298.75
+  },
+  {
+    "securityName": "DIS",
+    "value": 85.30
+  },
+  {
+    "securityName": "BA",
+    "value": 185.60
+  },
+  {
+    "securityName": "GLD",
+    "value": 185.45
+  },
+  {
+    "securityName": "SLV",
+    "value": 22.80
+  },
+  {
+    "securityName": "IBIT",
+    "value": 42.15
+  }
+]

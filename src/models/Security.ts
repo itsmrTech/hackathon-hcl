@@ -1,20 +1,13 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface ISecurity extends Document {
-  securityId: number;
   securityName: string;
   value: number;
-  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const securitySchema = new Schema<ISecurity>({
-  securityId: {
-    type: Number,
-    required: true,
-    unique: true,
-  },
   securityName: {
     type: String,
     required: true,
@@ -24,10 +17,6 @@ const securitySchema = new Schema<ISecurity>({
     type: Number,
     required: true,
     min: 0,
-  },
-  isActive: {
-    type: Boolean,
-    default: true,
   },
 }, {
   timestamps: true,

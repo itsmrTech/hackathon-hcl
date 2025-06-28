@@ -62,7 +62,8 @@ app.post('/order', (req, res) => {
       status: 'Completed',
       fundName,
       transactionType,
-      quantity
+      quantity,
+      unitPrice: Math.round(Math.random() * 100)
     });
   }, 5000); // Simulate 5 sec processing delay
 });
