@@ -1,0 +1,21 @@
+[{
+    "email": "alice.smith@example.com",
+    "password": "password123",
+    "firstName": "Alice",
+    "lastName": "Smith",
+    "accountBalance": 15000
+  },
+  {
+    "email": "bob.johnson@example.com",
+    "password": "password123",
+    "firstName": "Bob",
+    "lastName": "Johnson",
+    "accountBalance": 8000
+  },
+  {
+    "email": "emma.wilson@example.com",
+    "password": "password123",
+    "firstName": "Emma",
+    "lastName": "Wilson",
+    "accountBalance": 12000
+  }]

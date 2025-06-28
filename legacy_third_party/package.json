@@ -1,0 +1,21 @@
+{
+  "name": "legacy-third-party-mock-api",
+  "version": "1.0.0",
+  "description": "Mock third-party API server for legacy system integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js"
+  },
+  "keywords": ["mock", "api", "third-party", "legacy"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
