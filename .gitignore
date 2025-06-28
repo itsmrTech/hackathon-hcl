@@ -160,3 +160,5 @@ secrets/
 *.pem
 *.key
 *.crt 
+
+legacy_third_party/node_modules
