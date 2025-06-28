@@ -1,27 +1,14 @@
+// controllers/portfolioController.js
 const Portfolio = require('../models/Portfolio');
+const { validationResult } = require('express-validator');
 
+// Create Portfolio Entry
 exports.createPortfolioEntry = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
   try {
-    const {
-      orderRefNo,
-      securityName,
-      transactionType,
-      fromDate,
-      toDate,
-      quantity,
-      totalValue
-    } = req.body;
-
-    const portfolio = new Portfolio({
-      orderRefNo,
-      securityName,
-      transactionType,
-      fromDate,
-      toDate,
-      quantity,
-      totalValue
-    });
-
+    const portfolio = new Portfolio(req.body);
     const saved = await portfolio.save();
     res.status(201).json(saved);
   } catch (err) {
@@ -29,3 +16,14 @@ exports.createPortfolioEntry = async (req, res) => {
     res.status(500).json({ message: 'Error creating portfolio entry' });
   }
 };
+
+exports.getAllPortfolios = async (req, res) => {
+  try {
+    const portfolios = await Portfolio.find().sort({ createdAt: -1 });
+    res.status(200).json(portfolios);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error retrieving portfolios' });
+  }
+};
+
