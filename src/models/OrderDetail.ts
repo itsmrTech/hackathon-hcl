@@ -5,7 +5,7 @@ export interface IOrderDetail extends Document {
   orderRefNo: string;
   orderStatus: 'PENDING' | 'COMPLETED' | 'CANCELLED';
   transactionType: 'BUY' | 'SELL';
-  orderValue: string;
+  orderValue: number;
   createdOn: Date;
   createdBy: mongoose.Types.ObjectId;
 }
@@ -18,8 +18,9 @@ const orderDetailSchema = new Schema<IOrderDetail>({
   },
   orderRefNo: {
     type: String,
-    required: true,
+    required: false,
     unique: true,
+    sparse: true,
     trim: true,
   },
   orderStatus: {
@@ -34,9 +35,9 @@ const orderDetailSchema = new Schema<IOrderDetail>({
     required: true,
   },
   orderValue: {
-    type: String,
-    required: true,
-    trim: true,
+    type: Number,
+    required: false,
+    min:0
   },
   createdOn: {
     type: Date,
@@ -50,5 +51,7 @@ const orderDetailSchema = new Schema<IOrderDetail>({
 }, {
   timestamps: false, // We're managing timestamps manually
 });
+
+
 
 export const OrderDetail = mongoose.model<IOrderDetail>('OrderDetail', orderDetailSchema); 
