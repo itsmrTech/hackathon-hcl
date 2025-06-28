@@ -3,6 +3,8 @@ import Redis from 'ioredis';
 import { IOrderDetail } from "../../../models/OrderDetail";
 import { OrderDetail } from "../../../models/OrderDetail";
 import axios from 'axios';
+import { callThirdPartyPlaceOrder } from '../../../shared/caller';
+import { OrderService } from '../../order/services/orderService';
 
 export class QueueService {
     private static redis: Redis;
@@ -58,6 +60,7 @@ export class QueueService {
             orderValue: order.orderValue,
             securityDetail: order.securityDetail,
             createdBy: order.createdBy,
+            quantity: order.quantity,
         }, {
             priority: order.transactionType === 'BUY' ? 1 : 2, // BUY orders have higher priority
             delay: 0, // Process immediately
@@ -86,19 +89,20 @@ export class QueueService {
                 createdBy,
                 orderStatus: 'PENDING',
                 createdOn: new Date(),
+                quantity: job.data.quantity,
             };
 
             // Update job progress
             await job.updateProgress(50);
 
             // Simulate third-party API call
-            const result = await this.callThirdPartyPlaceOrder(orderData);
+            const result = await callThirdPartyPlaceOrder(orderData);
 
             // Update job progress
             await job.updateProgress(75);
 
             // Update order status in database
-            await this.updateOrderStatus(orderId, result.success ? 'COMPLETED' : 'CANCELLED', result.orderRefNo);
+            await OrderService.updateOrderStatus(orderId, result.success ? 'COMPLETED' : 'CANCELLED', result.orderRefNo);
 
             // Update job progress
             await job.updateProgress(100);
@@ -108,47 +112,15 @@ export class QueueService {
             console.error(`Failed to process order ${orderRefNo}:`, error);
             
             // Update order status to cancelled on error
-            await this.updateOrderStatus(orderId, 'CANCELLED');
+            await OrderService.updateOrderStatus(orderId, 'CANCELLED');
             
             throw error;
         }
     }
 
-    private static async updateOrderStatus(orderId: string, status: 'PENDING' | 'COMPLETED' | 'CANCELLED', orderRefNo?: string) {
-        try {
-            const updateData: any = { orderStatus: status };
-            if (orderRefNo) {
-                updateData.orderRefNo = orderRefNo;
-            }
+    
 
-            await OrderDetail.findByIdAndUpdate(orderId, updateData);
-            console.log(`Updated order ${orderId} status to ${status}`);
-        } catch (error) {
-            console.error(`Failed to update order status for ${orderId}:`, error);
-            throw error;
-        }
-    }
-
-    private static async callThirdPartyPlaceOrder(order: Partial<IOrderDetail> & { orderRefNo: string }) {
-        try {
-            // Call third-party API using axios
-            const response = await axios.post('http://localhost:3001/order', {
-                securityDetail: order.securityDetail,
-                transactionType: order.transactionType,
-                quantity: order.quantity,
-            });
-            
-            if (response.status !== 200) {
-                throw new Error('Third-party API call failed');
-            }
-
-            console.log(`Successfully placed order with third-party: ${order.orderRefNo}`);
-            return { success: true, orderRefNo: order.orderRefNo };
-        } catch (error) {
-            console.error('Error calling third-party place order:', error);
-            throw error;
-        }
-    }
+    
 
     static async getQueueStatus() {
         if (!this.orderQueue) {
