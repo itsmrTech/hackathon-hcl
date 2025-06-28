@@ -1,9 +1,8 @@
 export { User, type IUser } from './User'; // Main user model with authentication
-export { Order, type IOrder } from './Order'; // Main order model
-export { Security, type ISecurity } from './Security'; // Main security model
+export { OrderDetail, type IOrderDetail } from './OrderDetail'; // Detailed order information
+export { SecurityDetail, type ISecurityDetail } from './SecurityDetail'; // Security-specific details
 
 // Detailed user and system models (converted from JS)
-export { UserDetail, type IUserDetail } from './UserDetail'; // Basic user information
 export { UserLoginDetail, type IUserLoginDetail } from './UserLoginDetail'; // User login tracking
 export { AccountDetail, type IAccountDetail } from './AccountDetail'; // Account balance tracking
 export { AuditAction, type IAuditAction } from './AuditAction'; // User action auditing

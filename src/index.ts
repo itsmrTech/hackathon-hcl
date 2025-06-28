@@ -13,12 +13,14 @@ import { portfolioRoutes } from './modules/portfolio';
 import { orderRoutes } from './modules/order';
 import { transactionRoutes } from './modules/transactions';
 import { securityRoutes } from './modules/securities';
+import { QueueService } from './modules/queue';
+import { CronService } from './modules/cron';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env['PORT'] || 3000;
 
 // Middleware
 app.use(helmet());
@@ -38,7 +40,7 @@ app.use('/api/portfolio', portfolioRoutes);
 app.use('/api/order', orderRoutes);
 app.use('/api/transaction', transactionRoutes);
 app.use('/api/securities', securityRoutes);
-
+app.use('/api/portfolio', portfolioRoutes);
 // Error handling middleware
 app.use(notFound);
 app.use(errorHandler);
@@ -49,9 +51,15 @@ const startServer = async (): Promise<void> => {
     // Connect to MongoDB
     await connectDB();
     
+    // Initialize Queue Service
+    await QueueService.initialize();
+    
+    // Initialize Cron Service
+    CronService.initialize();
+    
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📊 Environment: ${process.env.NODE_ENV}`);
+      console.log(`📊 Environment: ${process.env['NODE_ENV']}`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);

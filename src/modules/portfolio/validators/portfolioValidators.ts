@@ -1,9 +1,11 @@
-import { query } from 'express-validator';
+const { body } = require('express-validator');
 
-export const validatePortfolioSummary = [
-  query('orderRefNo').optional().isString().withMessage('Order reference number must be a string'),
-  query('securityName').optional().isString().withMessage('Security name must be a string'),
-  query('transactionType').optional().isIn(['Buy', 'Sell']).withMessage('Transaction type must be either Buy or Sell'),
-  query('fromDate').optional().isISO8601().withMessage('From date must be a valid ISO date'),
-  query('toDate').optional().isISO8601().withMessage('To date must be a valid ISO date'),
-]; 
+exports.validatePortfolio = [
+  body('orderRefNo').notEmpty().withMessage('Order Ref No is required'),
+  body('securityName').notEmpty().withMessage('Security Name is required'),
+  body('transactionType').isIn(['Buy', 'Sell']).withMessage('Invalid transaction type'),
+  body('fromDate').isISO8601().withMessage('From Date must be a valid date'),
+  body('toDate').optional().isISO8601().withMessage('To Date must be a valid date'),
+  body('quantity').isNumeric().withMessage('Quantity must be a number'),
+  body('totalValue').isNumeric().withMessage('Total value must be a number')
+];
