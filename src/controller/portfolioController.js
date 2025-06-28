@@ -1,5 +1,4 @@
-// controllers/portfolioController.js
-const Portfolio = require('../models/Portfolio');
+const Portfolio = require('../modules/portfolio/models/portfolio');
 const { validationResult } = require('express-validator');
 
 exports.createPortfolioEntry = async (req, res) => {
