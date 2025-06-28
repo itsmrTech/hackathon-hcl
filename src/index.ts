@@ -14,6 +14,7 @@ import { orderRoutes } from './modules/order';
 import { transactionRoutes } from './modules/transactions';
 import { securityRoutes } from './modules/securities';
 import { QueueService } from './modules/queue';
+import { CronService } from './modules/cron';
 
 // Load environment variables
 dotenv.config();
@@ -52,6 +53,9 @@ const startServer = async (): Promise<void> => {
     
     // Initialize Queue Service
     await QueueService.initialize();
+    
+    // Initialize Cron Service
+    CronService.initialize();
     
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
